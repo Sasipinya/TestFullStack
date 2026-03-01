@@ -17,50 +17,31 @@ export function checkWinner(board: Board): { winner: string | null; line: number
   return { winner: null, line: null };
 }
 
-function minimax(board: Board, isMaximizing: boolean, depth: number): number {
-  const { winner } = checkWinner(board);
-  if (winner === "O") return 10 - depth;
-  if (winner === "X") return depth - 10;
-  if (winner === "draw") return 0;
-
-  if (isMaximizing) {
-    let best = -Infinity;
-    for (let i = 0; i < 9; i++) {
-      if (!board[i]) {
-        board[i] = "O";
-        best = Math.max(best, minimax(board, false, depth + 1));
-        board[i] = null;
-      }
+function getWinningMove(board: Board, player: string): number {
+  for (const [a, b, c] of WIN_LINES) {
+    const line = [board[a], board[b], board[c]];
+    const cells = [a, b, c];
+    const playerCount = line.filter((x) => x === player).length;
+    const emptyIdx = line.findIndex((x) => x === null);
+    if (playerCount === 2 && emptyIdx !== -1) {
+      return cells[emptyIdx];
     }
-    return best;
-  } else {
-    let best = Infinity;
-    for (let i = 0; i < 9; i++) {
-      if (!board[i]) {
-        board[i] = "X";
-        best = Math.min(best, minimax(board, true, depth + 1));
-        board[i] = null;
-      }
-    }
-    return best;
   }
+  return -1;
 }
 
 export function getBotMove(board: Board): number {
-  let bestScore = -Infinity;
-  let bestMove = -1;
-  const b = [...board];
+  const empty = board.map((v, i) => (v === null ? i : -1)).filter((i) => i !== -1);
 
-  for (let i = 0; i < 9; i++) {
-    if (!b[i]) {
-      b[i] = "O";
-      const score = minimax(b, false, 0);
-      b[i] = null;
-      if (score > bestScore) {
-        bestScore = score;
-        bestMove = i;
-      }
-    }
+  // 70% โอกาสเล่นแบบสุ่มสมบูรณ์
+  if (Math.random() < 0.7) {
+    return empty[Math.floor(Math.random() * empty.length)];
   }
-  return bestMove;
+
+  // 30% โอกาสบล็อกผู้เล่นถ้ากำลังจะชนะ
+  const block = getWinningMove(board, "X");
+  if (block !== -1) return block;
+
+  // ไม่งั้นสุ่ม
+  return empty[Math.floor(Math.random() * empty.length)];
 }

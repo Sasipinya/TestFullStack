@@ -304,7 +304,7 @@ export default function GameClient() {
               <p className="text-xs text-gray-400 uppercase tracking-wider mb-4">Opponent</p>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-lg font-light text-gray-400">
-                  AI
+                  BOT
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-700">Bot</p>
@@ -325,7 +325,7 @@ export default function GameClient() {
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="text-lg font-light" style={{ color: "#1a56db" }}>O</span>
-                  <span className="text-gray-500">Bot (AI)</span>
+                  <span className="text-gray-500">Bot (BOT)</span>
                 </div>
               </div>
             </div>

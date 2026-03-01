@@ -5,7 +5,7 @@
 
 ---
 
-## 🚀 วิธีติดตั้งและรัน
+##  วิธีติดตั้งและรัน
 
 ### 1. สร้าง GitHub OAuth App
 
@@ -43,7 +43,7 @@ npm run dev
 
 ---
 
-## 🎯 Features
+##  Features
 
 ### Authentication
 - **Sasipinya C. Authorization Code Flow** ผ่าน GitHub
@@ -51,7 +51,7 @@ npm run dev
 - Session management ด้วย NextAuth.js
 
 ### Game
-- **Tic-Tac-Toe** ผู้เล่น (X) vs บอท AI (O)
+- **Tic-Tac-Toe** ผู้เล่น (X) vs บอท BOT (O)
 - บอทใช้ **Minimax Algorithm** — เล่นได้อย่างเหมาะสมที่สุด
 - แสดง winning line พร้อม animation
 - บอทมี "thinking delay" ให้ UX ดีขึ้น
@@ -75,18 +75,18 @@ npm run dev
 
 ---
 
-## 🛠 Tech Stack
+##  Tech Stack
 
 - **Framework**: Next.js 15 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS v4
 - **Auth**: NextAuth.js v4 (GitHub Sasipinya C.)
 - **Database**: JSON file (data/db.json)
-- **Bot AI**: Minimax Algorithm
+- **Bot BOT**: Minimax Algorithm
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 ├── app/
@@ -102,7 +102,7 @@ npm run dev
 │   ├── GameClient.tsx           # Game UI component
 │   └── LeaderboardClient.tsx    # Leaderboard UI
 ├── lib/
-│   ├── bot.ts                   # Minimax AI + game logic
+│   ├── bot.ts                   # Minimax BOT + game logic
 │   └── db.ts                    # JSON database operations
 └── types/
     └── next-auth.d.ts           # Type extensions

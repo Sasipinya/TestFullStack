@@ -73,7 +73,7 @@ export default function LoginPage() {
             <span className="text-5xl font-light" style={{ color: "#1a56db" }}>O</span>
           </div>
           <h1 className="text-xl font-medium tracking-wide text-gray-800">OX Arena</h1>
-          <p className="text-sm text-gray-400 mt-1">Tic-Tac-Toe vs AI</p>
+          <p className="text-sm text-gray-400 mt-1">Tic-Tac-Toe vs BOT</p>
         </div>
 
         {/* Card */}
