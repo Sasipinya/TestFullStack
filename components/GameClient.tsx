@@ -131,15 +131,7 @@ export default function GameClient() {
             Leaderboard
           </button>
           <div className="flex items-center gap-2">
-            {session?.user?.image && (
-              <Image
-                src={session.user.image}
-                alt="avatar"
-                width={24}
-                height={24}
-                className="rounded-full"
-              />
-            )}
+            
             <span className="text-sm text-gray-600">{session?.user?.name}</span>
           </div>
           <button
