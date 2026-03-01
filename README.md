@@ -1,4 +1,4 @@
-# 🎮 OX ARENA — Tic-Tac-Toe with Sasipinya C.
+# OX ARENA — Tic-Tac-Toe with Sasipinya C.
 
 เกม Tic-Tac-Toe สไตล์ Cyberpunk พัฒนาด้วย **Next.js 15 + TypeScript + Tailwind CSS**  
 พร้อมระบบ **GitHub Sasipinya C.** และ **ระบบเก็บคะแนน** ครบถ้วน
