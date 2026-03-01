@@ -1,22 +1,25 @@
-# OX ARENA — Tic-Tac-Toe with Sasipinya C.
+# OX Arena — Tic-Tac-Toe
 
-เกม Tic-Tac-Toe สไตล์ Cyberpunk พัฒนาด้วย **Next.js 15 + TypeScript + Tailwind CSS**  
-พร้อมระบบ **GitHub Sasipinya C.** และ **ระบบเก็บคะแนน** ครบถ้วน
+เกม Tic-Tac-Toe พัฒนาด้วย Next.js 15 + TypeScript + Tailwind CSS  
+พร้อมระบบ OAuth 2.0 และระบบเก็บคะแนน
 
 ---
 
-##  วิธีติดตั้งและรัน
+## วิธีติดตั้งและรัน
 
-### 1. สร้าง GitHub OAuth App
+### 1. ตั้งค่า OAuth Providers
 
-1. ไปที่ **GitHub Settings** → **Developer settings** → **OAuth Apps** → **New OAuth App**
-   - หรือ: https://github.com/settings/applications/new
-2. กรอกข้อมูล:
-   - **Application name**: `OX Arena` (หรืออะไรก็ได้)
-   - **Homepage URL**: `http://localhost:3000`
-   - **Authorization callback URL**: `http://localhost:3000/api/auth/callback/github`
-3. คลิก **Register application**
-4. Copy **Client ID** และ **Generate a new client secret**
+สร้าง credentials จากแต่ละ platform แล้วเพิ่ม Callback URL ดังนี้:
+
+| Provider | Callback URL |
+|----------|-------------|
+| Google | `https://yourdomain.com/api/auth/callback/google` |
+| Facebook | `https://yourdomain.com/api/auth/callback/facebook` |
+| LINE | `https://yourdomain.com/api/auth/callback/line` |
+
+- **Google**: https://console.cloud.google.com/apis/credentials
+- **Facebook**: https://developers.facebook.com/apps
+- **LINE**: https://developers.line.biz/console
 
 ### 2. ตั้งค่า Environment Variables
 
@@ -25,11 +28,22 @@ cp .env.example .env.local
 ```
 
 แก้ไขไฟล์ `.env.local`:
+
 ```env
-GITHUB_CLIENT_ID=<Client ID จาก GitHub>
-GITHUB_CLIENT_SECRET=<Client Secret จาก GitHub>
-NEXTAUTH_SECRET=<random string เช่น: openssl rand -base64 32>
+NEXTAUTH_SECRET=<random string>
 NEXTAUTH_URL=http://localhost:3000
+
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+
+FACEBOOK_CLIENT_ID=
+FACEBOOK_CLIENT_SECRET=
+
+LINE_CLIENT_ID=
+LINE_CLIENT_SECRET=
+
+POSTGRES_URL=
+POSTGRES_URL_NON_POOLING=
 ```
 
 ### 3. ติดตั้ง Dependencies และรัน
@@ -43,20 +57,20 @@ npm run dev
 
 ---
 
-##  Features
+## Features
 
 ### Authentication
-- **Sasipinya C. Authorization Code Flow** ผ่าน GitHub
+- OAuth 2.0 Authorization Code Flow ผ่าน Google, Facebook, LINE
 - เข้าสู่ระบบได้ก็ต่อเมื่อ authenticate สำเร็จ
 - Session management ด้วย NextAuth.js
 
 ### Game
-- **Tic-Tac-Toe** ผู้เล่น (X) vs บอท BOT (O)
-- บอทใช้ **Minimax Algorithm** — เล่นได้อย่างเหมาะสมที่สุด
-- แสดง winning line พร้อม animation
-- บอทมี "thinking delay" ให้ UX ดีขึ้น
+- Tic-Tac-Toe ผู้เล่น (X) vs บอท AI (O)
+- บอทเล่นแบบสุ่ม มีโอกาสแพ้ได้
+- แสดง winning line เมื่อจบเกม
 
 ### Score System
+
 | ผลลัพธ์ | คะแนน |
 |--------|-------|
 | ชนะ | +1 pt |
@@ -69,24 +83,22 @@ npm run dev
 
 ### Leaderboard
 - ตาราง ranking ผู้เล่นทั้งหมด
-- Podium สำหรับ Top 3
 - ค้นหาผู้เล่นได้
 - แสดง Win Rate, W/L/D stats
 
 ---
 
-##  Tech Stack
+## Tech Stack
 
 - **Framework**: Next.js 15 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS v4
-- **Auth**: NextAuth.js v4 (GitHub Sasipinya C.)
-- **Database**: JSON file (data/db.json)
-- **Bot BOT**: Minimax Algorithm
+- **Auth**: NextAuth.js v4 (OAuth 2.0)
+- **Database**: Neon Serverless Postgres
 
 ---
 
-##  Project Structure
+## Project Structure
 
 ```
 ├── app/
@@ -102,8 +114,18 @@ npm run dev
 │   ├── GameClient.tsx           # Game UI component
 │   └── LeaderboardClient.tsx    # Leaderboard UI
 ├── lib/
-│   ├── bot.ts                   # Minimax BOT + game logic
-│   └── db.ts                    # JSON database operations
+│   ├── bot.ts                   # Bot AI + game logic
+│   └── db.ts                    # Neon Postgres operations
 └── types/
     └── next-auth.d.ts           # Type extensions
 ```
+
+---
+
+## Deploy บน Vercel
+
+1. Push โปรเจกต์ขึ้น GitHub
+2. Import repository ที่ https://vercel.com/new
+3. ไปที่ **Storage** → สร้าง Neon Postgres database → Connect กับโปรเจกต์
+4. เพิ่ม Environment Variables ที่ **Settings** → **Environment Variables**
+5. Redeploy
