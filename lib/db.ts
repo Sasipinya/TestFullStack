@@ -1,141 +1,110 @@
-import fs from "fs";
-import path from "path";
+import { sql } from "@vercel/postgres";
 
-const DB_PATH = path.join(process.cwd(), "data", "db.json");
-
-interface PlayerRecord {
-  userId: string;
-  name: string;
-  email: string;
-  image: string;
-  score: number;
-  wins: number;
-  losses: number;
-  draws: number;
-  consecutiveWins: number;
-  lastUpdated: string;
+export async function initDB() {
+  await sql`
+    CREATE TABLE IF NOT EXISTS players (
+      user_id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      email TEXT,
+      image TEXT,
+      score INTEGER DEFAULT 0,
+      wins INTEGER DEFAULT 0,
+      losses INTEGER DEFAULT 0,
+      draws INTEGER DEFAULT 0,
+      consecutive_wins INTEGER DEFAULT 0,
+      last_updated TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
 }
 
-interface GameLog {
-  id: string;
-  userId: string;
-  result: "win" | "loss" | "draw";
-  scoreChange: number;
-  bonusAwarded: boolean;
-  createdAt: string;
+export async function getOrCreatePlayer(
+  userId: string,
+  name: string,
+  email: string,
+  image: string
+) {
+  await initDB();
+  await sql`
+    INSERT INTO players (user_id, name, email, image)
+    VALUES (${userId}, ${name}, ${email}, ${image})
+    ON CONFLICT (user_id) DO UPDATE
+    SET name = ${name}, email = ${email}, image = ${image}, last_updated = NOW()
+  `;
 }
 
-interface DB {
-  players: PlayerRecord[];
-  gameLogs: GameLog[];
+export async function getPlayer(userId: string) {
+  await initDB();
+  const { rows } = await sql`
+    SELECT * FROM players WHERE user_id = ${userId}
+  `;
+  if (!rows[0]) return null;
+  return toPlayer(rows[0]);
 }
 
-function ensureDataDir() {
-  const dir = path.join(process.cwd(), "data");
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  if (!fs.existsSync(DB_PATH)) fs.writeFileSync(DB_PATH, JSON.stringify({ players: [], gameLogs: [] }));
-}
-
-function readDB(): DB {
-  ensureDataDir();
-  const raw = fs.readFileSync(DB_PATH, "utf-8");
-  return JSON.parse(raw);
-}
-
-function writeDB(db: DB) {
-  ensureDataDir();
-  fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2));
-}
-
-export function getOrCreatePlayer(userId: string, name: string, email: string, image: string): PlayerRecord {
-  const db = readDB();
-  let player = db.players.find((p) => p.userId === userId);
-  if (!player) {
-    player = {
-      userId,
-      name,
-      email,
-      image,
-      score: 0,
-      wins: 0,
-      losses: 0,
-      draws: 0,
-      consecutiveWins: 0,
-      lastUpdated: new Date().toISOString(),
-    };
-    db.players.push(player);
-    writeDB(db);
-  } else {
-    // Update profile info
-    player.name = name;
-    player.email = email;
-    player.image = image;
-    writeDB(db);
-  }
-  return player;
-}
-
-export function getPlayer(userId: string): PlayerRecord | null {
-  const db = readDB();
-  return db.players.find((p) => p.userId === userId) || null;
-}
-
-export function recordGameResult(
+export async function recordGameResult(
   userId: string,
   result: "win" | "loss" | "draw"
-): { player: PlayerRecord; bonusAwarded: boolean; scoreChange: number } {
-  const db = readDB();
-  const player = db.players.find((p) => p.userId === userId);
+) {
+  await initDB();
+  const { rows } = await sql`
+    SELECT * FROM players WHERE user_id = ${userId}
+  `;
+  const player = rows[0];
   if (!player) throw new Error("Player not found");
 
   let scoreChange = 0;
   let bonusAwarded = false;
+  let newConsecutiveWins = player.consecutive_wins;
 
   if (result === "win") {
     scoreChange = 1;
-    player.wins += 1;
-    player.consecutiveWins += 1;
-    if (player.consecutiveWins >= 3) {
-      scoreChange += 1; // bonus point
+    newConsecutiveWins += 1;
+    if (newConsecutiveWins >= 3) {
+      scoreChange += 1;
       bonusAwarded = true;
-      player.consecutiveWins = 0; // reset
+      newConsecutiveWins = 0;
     }
   } else if (result === "loss") {
     scoreChange = -1;
-    player.losses += 1;
-    player.consecutiveWins = 0;
+    newConsecutiveWins = 0;
   } else {
-    player.draws += 1;
-    player.consecutiveWins = 0;
+    newConsecutiveWins = 0;
   }
 
-  player.score += scoreChange;
-  player.lastUpdated = new Date().toISOString();
+  const { rows: updated } = await sql`
+    UPDATE players SET
+      score = score + ${scoreChange},
+      wins = wins + ${result === "win" ? 1 : 0},
+      losses = losses + ${result === "loss" ? 1 : 0},
+      draws = draws + ${result === "draw" ? 1 : 0},
+      consecutive_wins = ${newConsecutiveWins},
+      last_updated = NOW()
+    WHERE user_id = ${userId}
+    RETURNING *
+  `;
 
-  // Log game
-  const log: GameLog = {
-    id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-    userId,
-    result,
-    scoreChange,
-    bonusAwarded,
-    createdAt: new Date().toISOString(),
+  return { player: toPlayer(updated[0]), bonusAwarded, scoreChange };
+}
+
+export async function getAllPlayers() {
+  await initDB();
+  const { rows } = await sql`
+    SELECT * FROM players ORDER BY score DESC
+  `;
+  return rows.map(toPlayer);
+}
+
+function toPlayer(row: Record<string, unknown>) {
+  return {
+    userId: row.user_id as string,
+    name: row.name as string,
+    email: row.email as string,
+    image: row.image as string,
+    score: row.score as number,
+    wins: row.wins as number,
+    losses: row.losses as number,
+    draws: row.draws as number,
+    consecutiveWins: row.consecutive_wins as number,
+    lastUpdated: row.last_updated as string,
   };
-  db.gameLogs.push(log);
-
-  writeDB(db);
-  return { player, bonusAwarded, scoreChange };
-}
-
-export function getAllPlayers(): PlayerRecord[] {
-  const db = readDB();
-  return db.players.sort((a, b) => b.score - a.score);
-}
-
-export function getRecentLogs(userId: string, limit = 10): GameLog[] {
-  const db = readDB();
-  return db.gameLogs
-    .filter((l) => l.userId === userId)
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    .slice(0, limit);
 }
