@@ -1,4 +1,6 @@
-import { sql } from "@vercel/postgres";
+import { neon } from "@neondatabase/serverless";
+
+const sql = neon(process.env.POSTGRES_URL!);
 
 export async function initDB() {
   await sql`
@@ -34,7 +36,7 @@ export async function getOrCreatePlayer(
 
 export async function getPlayer(userId: string) {
   await initDB();
-  const { rows } = await sql`
+  const rows = await sql`
     SELECT * FROM players WHERE user_id = ${userId}
   `;
   if (!rows[0]) return null;
@@ -46,7 +48,7 @@ export async function recordGameResult(
   result: "win" | "loss" | "draw"
 ) {
   await initDB();
-  const { rows } = await sql`
+  const rows = await sql`
     SELECT * FROM players WHERE user_id = ${userId}
   `;
   const player = rows[0];
@@ -54,7 +56,7 @@ export async function recordGameResult(
 
   let scoreChange = 0;
   let bonusAwarded = false;
-  let newConsecutiveWins = player.consecutive_wins;
+  let newConsecutiveWins = player.consecutive_wins as number;
 
   if (result === "win") {
     scoreChange = 1;
@@ -71,7 +73,7 @@ export async function recordGameResult(
     newConsecutiveWins = 0;
   }
 
-  const { rows: updated } = await sql`
+  const updated = await sql`
     UPDATE players SET
       score = score + ${scoreChange},
       wins = wins + ${result === "win" ? 1 : 0},
@@ -88,7 +90,7 @@ export async function recordGameResult(
 
 export async function getAllPlayers() {
   await initDB();
-  const { rows } = await sql`
+  const rows = await sql`
     SELECT * FROM players ORDER BY score DESC
   `;
   return rows.map(toPlayer);
