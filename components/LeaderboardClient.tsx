@@ -1,9 +1,7 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 
 interface Player {
   userId: string;
@@ -113,19 +111,11 @@ export default function LeaderboardClient() {
                       <td className="px-4 py-3 text-gray-400 text-xs">{idx + 1}</td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
-                          {player.image ? (
-                            <Image
-                              src={player.image}
-                              alt="avatar"
-                              width={24}
-                              height={24}
-                              className="rounded-full"
-                            />
-                          ) : (
-                            <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-xs text-gray-400">
-                              {player.name[0]}
-                            </div>
-                          )}
+
+                          <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-xs text-gray-400">
+                            {player.name[0]}
+                          </div>
+
                           <span className={isMe ? "font-medium text-gray-800" : "text-gray-700"}>
                             {player.name}
                             {isMe && <span className="ml-1.5 text-xs text-gray-400">(you)</span>}
