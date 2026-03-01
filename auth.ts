@@ -1,7 +1,6 @@
 import { NextAuthOptions, getServerSession } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import FacebookProvider from "next-auth/providers/facebook";
-import TwitterProvider from "next-auth/providers/twitter";
 import LineProvider from "next-auth/providers/line";
 import { getOrCreatePlayer } from "@/lib/db";
 
@@ -19,11 +18,6 @@ export const authOptions: NextAuthOptions = {
           scope: "public_profile",
         },
       },
-    }),
-    TwitterProvider({
-      clientId: process.env.TWITTER_CLIENT_ID!,
-      clientSecret: process.env.TWITTER_CLIENT_SECRET!,
-      version: "2.0",
     }),
     LineProvider({
       clientId: process.env.LINE_CLIENT_ID!,

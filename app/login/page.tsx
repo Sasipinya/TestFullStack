@@ -41,17 +41,6 @@ const providers = [
       </svg>
     ),
   },
-  {
-    id: "twitter",
-    name: "X (Twitter)",
-    color: "#000000",
-    textColor: "#ffffff",
-    icon: (
-      <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor">
-        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-      </svg>
-    ),
-  },
 ];
 
 export default function LoginPage() {
@@ -65,7 +54,6 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#f9f9f9]">
       <div className="w-full max-w-sm mx-4">
-        {/* Logo */}
         <div className="text-center mb-10">
           <div className="flex items-center justify-center gap-4 mb-4">
             <span className="text-5xl font-semibold" style={{ color: "#cc3333" }}>X</span>
@@ -73,10 +61,9 @@ export default function LoginPage() {
             <span className="text-5xl font-light" style={{ color: "#1a56db" }}>O</span>
           </div>
           <h1 className="text-xl font-medium tracking-wide text-gray-800">OX Arena</h1>
-          <p className="text-sm text-gray-400 mt-1">Tic-Tac-Toe vs BOT</p>
+          <p className="text-sm text-gray-400 mt-1">Tic-Tac-Toe vs AI</p>
         </div>
 
-        {/* Card */}
         <div className="bg-white border border-gray-200 rounded-lg p-8">
           <p className="text-sm text-gray-500 text-center mb-6">
             Sign in to track your score and rank on the leaderboard
@@ -128,7 +115,7 @@ export default function LoginPage() {
         </div>
 
         <p className="text-center text-xs text-gray-400 mt-4">
-          Sasipinya C. — Authorization Code Flow
+          Sasipinya — Authorization Code Flow
         </p>
       </div>
     </div>
