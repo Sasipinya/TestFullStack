@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid result" }, { status: 400 });
   }
 
-  const data = recordGameResult(userId, result);
+  const data = await recordGameResult(userId, result);
   return NextResponse.json(data);
 }
 
@@ -26,6 +26,6 @@ export async function GET() {
   const userId = (session.user as { id?: string }).id;
   if (!userId) return NextResponse.json({ error: "No user ID" }, { status: 401 });
 
-  const player = getPlayer(userId);
+  const player = await getPlayer(userId);
   return NextResponse.json({ player });
 }

@@ -27,7 +27,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user, account }) {
       if (user.id) {
-        getOrCreatePlayer(
+        await getOrCreatePlayer(
           `${account?.provider}:${user.id}`,
           user.name ?? "Anonymous",
           user.email ?? "",
