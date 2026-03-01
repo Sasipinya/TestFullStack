@@ -1,8 +1,12 @@
 import { neon } from "@neondatabase/serverless";
 
-const sql = neon(process.env.POSTGRES_URL!);
+function getSQL() {
+  const url = process.env.POSTGRES_URL_NON_POOLING ?? process.env.POSTGRES_URL!;
+  return neon(url);
+}
 
 export async function initDB() {
+  const sql = getSQL();
   await sql`
     CREATE TABLE IF NOT EXISTS players (
       user_id TEXT PRIMARY KEY,
@@ -25,6 +29,7 @@ export async function getOrCreatePlayer(
   email: string,
   image: string
 ) {
+  const sql = getSQL();
   await initDB();
   await sql`
     INSERT INTO players (user_id, name, email, image)
@@ -35,6 +40,7 @@ export async function getOrCreatePlayer(
 }
 
 export async function getPlayer(userId: string) {
+  const sql = getSQL();
   await initDB();
   const rows = await sql`
     SELECT * FROM players WHERE user_id = ${userId}
@@ -47,6 +53,7 @@ export async function recordGameResult(
   userId: string,
   result: "win" | "loss" | "draw"
 ) {
+  const sql = getSQL();
   await initDB();
   const rows = await sql`
     SELECT * FROM players WHERE user_id = ${userId}
@@ -89,6 +96,7 @@ export async function recordGameResult(
 }
 
 export async function getAllPlayers() {
+  const sql = getSQL();
   await initDB();
   const rows = await sql`
     SELECT * FROM players ORDER BY score DESC
